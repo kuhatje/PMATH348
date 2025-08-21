@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Suites Counter</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #f3f4f6;
+      --card: #e5e7eb;
+      --text: #111827;
+      --muted: #374151;
+      --accent: #2563eb;
+      --btn: #f9fafb;
+      --ring: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+    }
+    .app {
+      max-width: 520px; margin: 0 auto; padding: 16px;
+      min-height: 100%; display: flex; flex-direction: column; gap: 16px;
+    }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .title { font-weight: 700; font-size: 18px; color: var(--text); }
+
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (min-width: 420px){ .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+    .btn {
+      background: var(--btn);
+      border: 1px solid #d1d5db; border-radius: 16px; padding: 14px 12px; text-align: center; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+      transition: transform .06s ease, box-shadow .15s ease;
+      user-select: none;
+    }
+    .btn:active { transform: translateY(1px) scale(.995); }
+    .btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--ring), 0 0 0 6px rgba(37,99,235,.35); }
+
+    .emoji { font-size: 24px; line-height: 1; display: block; }
+    .name { margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+    .count {
+      margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px;
+      padding: 6px 10px; border-radius: 9999px; background: #f3f4f6; border: 1px solid #d1d5db; font-variant-numeric: tabular-nums;
+    }
+
+    .footer { margin-top: auto; display: flex; gap: 10px; }
+    .reset {
+      flex: 1; background: #dc2626;
+      border: 1px solid #b91c1c; color: #fff; font-weight: 700; border-radius: 14px; padding: 14px; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    .reset:active { transform: translateY(1px) scale(.995); }
+    .reset:focus-visible { outline: none; box-shadow: 0 0 0 2px #f87171, 0 0 0 6px rgba(248,113,113,.35); }
+
+    .btn, .reset { min-height: 72px; }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Suites counter">
+    <header>
+      <div class="title">Suites Counter</div>
+    </header>
+
+    <main class="grid" id="grid" aria-label="Suites buttons">
+      <!-- Buttons injected by JS -->
+    </main>
+
+    <div class="footer">
+      <button id="reset" class="reset" type="button" aria-label="Reset all counters">Reset All</button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const SUITES = [
+        { key: 'hearts', label: 'Hearts', emoji: '❤\uFE0F' },
+        { key: 'diamonds', label: 'Diamonds', emoji: '♦\uFE0F' },
+        { key: 'clubs', label: 'Clubs', emoji: '♣\uFE0F' },
+        { key: 'spades', label: 'Spades', emoji: '♠\uFE0F' },
+        { key: 'crown', label: 'Crown', emoji: '👑' },
+        { key: 'anchor', label: 'Anchor', emoji: '⚓\uFE0F' },
+        { key: 'stage', label: 'Stage' }
+      ];
+
+      const state = {};
+      for (const s of SUITES) state[s.key] = 0;
+
+      const grid = document.getElementById('grid');
+
+      for (const s of SUITES) {
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.type = 'button';
+        btn.setAttribute('data-key', s.key);
+        btn.setAttribute('aria-label', `${s.label} counter`);
+        btn.innerHTML = `
+          <span class="emoji" aria-hidden="true">${s.emoji}</span>
+          <span class="name">${s.label}</span>
+          <span class="count"><span>Count</span><span id="count-${s.key}">0</span></span>
+        `;
+        btn.addEventListener('click', () => {
+          state[s.key] += 1;
+          updateUI();
+        });
+        grid.appendChild(btn);
+      }
+
+      document.getElementById('reset').addEventListener('click', () => {
+        for (const s of SUITES) state[s.key] = 0;
+        updateUI();
+      });
+
+      function updateUI(){
+        for (const s of SUITES) {
+          const el = document.getElementById(`count-${s.key}`);
+          if (el) el.textContent = String(state[s.key]);
+        }
+      }
+
+      updateUI();
+    })();
+  </script>
+</body>
+</html>
